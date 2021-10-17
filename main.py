@@ -4,7 +4,7 @@ Authors:
 Nathaniel Champion
 Hugh Hamilton
 Chris Beatrez
-Andrew K
+Andrew Kivrak
 
 Description:
 This program takes a json file and runs a bayesian classification calculation
