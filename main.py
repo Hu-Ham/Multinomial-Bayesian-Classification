@@ -18,6 +18,13 @@ import json
 import re
 from nltk.tokenize import word_tokenize
 
+# Use of the NLTK package to "clean" data by removing stop-words, and then assess most common remaining words
+nltk.download(['stopwords', 'punkt'])
+ENGLISH_RE = re.compile(r'[a-z]+')
+stop_words = nltk.corpus.stopwords.words("english")
+stop_words.append('said')  # Removal of the word "said", a common stop-word not in the stop word corpus
+
+
 #Importing in the json file that contains the data
 data = [json.loads(line) for line in open('News_Category_Dataset_v2.json', 'r')]
 
