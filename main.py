@@ -16,6 +16,7 @@ determine how well the calculation did.
 #Import libraries required for code to run
 import json
 import re
+import nltk 
 from nltk.tokenize import word_tokenize
 
 # Use of the NLTK package to "clean" data by removing stop-words, and then assess most common remaining words
