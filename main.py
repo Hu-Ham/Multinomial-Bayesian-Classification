@@ -16,15 +16,10 @@ determine how well the calculation did.
 #Import libraries required for code to run
 import json
 import re
-import nltk 
 from nltk.tokenize import word_tokenize
-
-# Use of the NLTK package to "clean" data by removing stop-words, and then assess most common remaining words
-nltk.download(['stopwords', 'punkt'])
-ENGLISH_RE = re.compile(r'[a-z]+')
-stop_words = nltk.corpus.stopwords.words("english")
-stop_words.append('said')  # Removal of the word "said", a common stop-word not in the stop word corpus
-
+from nltk.corpus import stopwords
+stop_words = set(stopwords.words('english'))
+import nltk
 
 #Importing in the json file that contains the data
 data = [json.loads(line) for line in open('News_Category_Dataset_v2.json', 'r')]
@@ -60,6 +55,8 @@ tempList = []
 totalKeywords = []
 counter = 0
 tokenKeywords = []
+keywords = []
+finalKeywords = []
 
 """
 This for loop strips out the information that is not the headline or short description part
@@ -69,6 +66,7 @@ for spaces and then tokenizes the data element.
 """
 for i in testSet:
     temp = str(i)
+    temp = temp.lower()
     tempList = temp.split("'headline':")
     temp = str(tempList[1])
     tempList = temp.split("'authors'")
@@ -82,11 +80,25 @@ for i in range(0, len(testSet)):
     totalKeywords.append(str(description[counter]) + str(headline[counter]))
     counter += 1 
 
-for i in totalKeywords:
+stopWords = []
+
+for i in totalKeywords[0:10]:
     s = re.sub(r'[^A-Za-z0-9 ]+', '', i)
     tokenKeywords.append(word_tokenize(s))
+for i in stop_words:
+    stopWords.append(i)
+
+counter = 0
 
 for i in tokenKeywords:
-    print(i)
-     
+    for x in i:
+        if x in stopWords:
+            tokenKeywords[counter].remove(str(x))
+    counter += 1
 
+
+
+for i in tokenKeywords:
+    freqDistro = nltk.FreqDist(i)
+    commonList = freqDistro.most_common()
+    print(commonList)
