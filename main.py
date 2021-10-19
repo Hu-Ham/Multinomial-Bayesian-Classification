@@ -98,7 +98,23 @@ for i in tokenKeywords:
 
 
 
-for i in tokenKeywords:
+for i in tokenKeywords[0:2]:
     freqDistro = nltk.FreqDist(i)
-    commonList = freqDistro.most_common()
+    commonList = list(freqDistro.most_common())
     print(commonList)
+
+counter = 0
+totalWords = 0
+percentWords = []
+while counter in range(0,2):
+    for x in commonList:
+        totalWords = totalWords + x[1]
+    print(totalWords)
+    for x in commonList:
+        value = x[1] + 1
+        percent = value/totalWords
+        percentWords.append([x[0], value, percent])
+    counter += 1
+    print("\n\n\nFlag" + str(percentWords))
+print("\n\n\nFinal" + str(percentWords))
+    
