@@ -21,6 +21,43 @@ from nltk.corpus import stopwords
 stop_words = set(stopwords.words('english'))
 import nltk
 
+######################FUNCTIONS######################
+"""
+This Function takes a Category type and a Category list and combines
+all the word counts. For example if there are two 'murder', '1' it deletes
+one and makes it 'murder', '2' 
+"""
+def CatWords(Cat, WordVar):
+    counter = 0
+    print(Cat)
+    for x in testSet:
+        if Cat in str(x):
+            primeArray.append(commonList[counter])
+        counter += 1
+    counter = 0
+    
+    for i in primeArray:
+        for x in i:
+            if x[0] not in stopWords:
+                if x[0] not in testWordList:
+                    testWordList.append(x[0])
+                    WordVar.append([x[0], (x[1])])
+                else:
+                    for y in WordVar:
+                        if x[0] == y[0]:
+                            WordVar.remove(y)
+                            WordVar.append([x[0], (x[1]+y[1])])     
+    primeArray.clear()
+"""
+Counts the total number of words in the list
+"""
+def CatWordsCount(Cat, WordVar):
+    count = 0
+    for y in WordVar:
+        count += y[1]
+    return count
+
+
 #Importing in the json file that contains the data
 data = [json.loads(line) for line in open('News_Category_Dataset_v2.json', 'r')]
 
@@ -31,6 +68,7 @@ of the total dataset and will be used as reference. The checkset data set will b
 determine each classification. The for loop will append each data element into a
 list.
 """
+CrimeWordCount = 0
 testCount = round(.2*len(data))
 testSet = []
 checkSet = []
@@ -46,7 +84,7 @@ Categories = ['CRIME', 'ENTERTAINMENT', 'WORLD NEWS', 'IMPACT', 'POLITICS', 'WEI
               'BLACK VOICES', 'WOMEN', 'COMEDY', 'QUEER VOICES', 'SPORTS', 'BUSINESS',
               'TRAVEL', 'MEDIA', 'TECH', 'RELIGION', 'SCIENCE', 'LATINO VOICES',
               'EDUCATION', 'COLLEGE', 'PARENTS', 'ARTS & CULTURE', 'STYLE', 'GREEN', 'TASTE',
-              'HEALTHY LIVING', 'THE WORLDPOST', 'GOOD NEWS', 'FIFTY', 'ARTS']
+              'HEALTHY LIVING', 'WORLDPOST', 'GOOD NEWS', 'FIFTY', 'ARTS']
 #List and variables needed to strip unnecessary information and tokenize each data element
 headline = []
 description = []
@@ -82,8 +120,8 @@ for i in range(0, len(testSet)):
 
 stopWords = []
 
-for i in totalKeywords[0:10]:
-    s = re.sub(r'[^A-Za-z0-9 ]+', '', i)
+for i in totalKeywords:
+    s = re.sub(r'[^A-Za-z ]+', '', i)
     tokenKeywords.append(word_tokenize(s))
 for i in stop_words:
     stopWords.append(i)
@@ -99,52 +137,22 @@ for i in tokenKeywords:
 
 commonList = []
 
-for i in tokenKeywords[0:2]:
+for i in tokenKeywords:
     freqDistro = nltk.FreqDist(i)
     commonList.append(list(freqDistro.most_common()))
 
-
-
-counter = 0
-totalWords = 0
-percentWords = []
 primeArray = []
+   
+counter = 0
+CrimeWords = []
+testWordList = []
+
+CatWords(Categories[0], CrimeWords)
+CrimeWordCount = CatWordsCount(Categories[0], CrimeWords)
+CrimeWords.sort()
+
+print("Total number of words for Crime Articles: " + str(CrimeWordCount))
+print("Unique Words and the number times they occur.")
+print(CrimeWords)
 
 
-##
-##for x in commonList:
-##    for y in x:
-##        totalWords = totalWords + x[1][1]
-##    for z in commonList:
-##        value = z[1][1] + 1
-##        percent = value/totalWords
-##        
-##        for y in z:
-##            percentWords.append([y[0], value, percent])
-##    for value in percentWords:
-##        
-##        primeArray[counter].append(value)
-##        percentWords.clear()
-##    
-##    totalWords = 0
-##    counter += 1
-##for i in primeArray:
-##    print(i)
-##    print("NEW \n\n\n")
-##    
-##
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
