@@ -28,25 +28,27 @@ all the word counts. For example if there are two 'murder', '1' it deletes
 one and makes it 'murder', '2' 
 """
 def CatWords(Cat, WordVar):
+    testWordList = []
     counter = 0
-    print(Cat)
+    catList = 0
     for x in testSet:
         if Cat in str(x):
-            primeArray.append(commonList[counter])
+            primeArray.append(listTest[counter])
         counter += 1
     counter = 0
+    
     
     for i in primeArray:
         for x in i:
             if x[0] not in stopWords:
                 if x[0] not in testWordList:
                     testWordList.append(x[0])
-                    WordVar.append([x[0], (x[1])])
+                    WordVar.append([x[0], 1])
                 else:
                     for y in WordVar:
                         if x[0] == y[0]:
                             WordVar.remove(y)
-                            WordVar.append([x[0], (x[1]+y[1])])     
+                            WordVar.append([x[0], (x[1]+1)])     
     primeArray.clear()
 """
 Counts the total number of words in the list
@@ -57,6 +59,36 @@ def CatWordsCount(Cat, WordVar):
         count += y[1]
     return count
 
+
+def compCat(wordVar):
+    counter = 0
+    tempResults = []
+    finalResults = []
+    strResults = ''
+    for i in listCheck:
+        tempResults.clear()
+        strResults = ''
+        for z in i:
+            for x in wordVar:
+                tempWord = z[0]
+                if tempWord == x[0]:
+                    tempResults.append(x[1]/CrimeWordCount)    
+        for i in tempResults:
+            strResults = strResults + " " + str(i)
+        results = strResults[1:]
+        finalResults.append([results])
+    return(finalResults)
+def probCat(Cat):
+    probCat = []
+    for i in Cat:
+        count = 0
+        for x in listTest:
+            tempData = str(x)
+            if i in tempData:
+                count += 1
+        probCat.append(count/len(testSet))
+
+    return(probCat)
 
 #Importing in the json file that contains the data
 data = [json.loads(line) for line in open('News_Category_Dataset_v2.json', 'r')]
@@ -83,7 +115,7 @@ for i in data[testCount+1: ]:
 Categories = ['CRIME', 'ENTERTAINMENT', 'WORLD NEWS', 'IMPACT', 'POLITICS', 'WEIRD NEWS',
               'BLACK VOICES', 'WOMEN', 'COMEDY', 'QUEER VOICES', 'SPORTS', 'BUSINESS',
               'TRAVEL', 'MEDIA', 'TECH', 'RELIGION', 'SCIENCE', 'LATINO VOICES',
-              'EDUCATION', 'COLLEGE', 'PARENTS', 'ARTS & CULTURE', 'STYLE', 'GREEN', 'TASTE',
+              'EDUCATION', 'COLLEGE', 'PARENTS', 'STYLE', 'GREEN', 'TASTE',
               'HEALTHY LIVING', 'WORLDPOST', 'GOOD NEWS', 'FIFTY', 'ARTS']
 #List and variables needed to strip unnecessary information and tokenize each data element
 headline = []
@@ -102,57 +134,122 @@ of each data element and stores them in two separate lists. The next for loop co
 those two lists into one. And finally the third loop strips non-alphanumeric characters except
 for spaces and then tokenizes the data element.
 """
-for i in testSet:
-    temp = str(i)
-    temp = temp.lower()
-    tempList = temp.split("'headline':")
-    temp = str(tempList[1])
-    tempList = temp.split("'authors'")
-    headline.append(tempList[0])
-    tempList = temp.split("'short_description':")
-    temp = str(tempList[1])
-    tempList = temp.split("'date':")
-    description.append(tempList[0])
+##for i in testSet:
+##    temp = str(i)
+##    temp = temp.lower()
+##    tempList = temp.split("'headline':")
+##    temp = str(tempList[1])
+##    tempList = temp.split("'authors'")
+##    headline.append(tempList[0])
+##    tempList = temp.split("'short_description':")
+##    temp = str(tempList[1])
+##    tempList = temp.split("'date':")
+##    description.append(tempList[0])
+##
+##for i in range(0, len(testSet)):
+##    totalKeywords.append(str(description[counter]) + str(headline[counter]))
+##    counter += 1 
+##
+##stopWords = []
+##
+##for i in totalKeywords:
+##    s = re.sub(r'[^A-Za-z ]+', '', i)
+##    tokenKeywords.append(word_tokenize(s))
+##for i in stop_words:
+##    stopWords.append(i)
+##
+##counter = 0
+##
+##for i in tokenKeywords:
+##    for x in i:
+##        if x in stopWords:
+##            tokenKeywords[counter].remove(str(x))
+##    counter += 1
+##
+##
+##
+##
+##for i in tokenKeywords:
+##    freqDistro = nltk.FreqDist(i)
+##    commonList.append(list(freqDistro.most_common()))
+##
+##primeArray = []
+   
 
-for i in range(0, len(testSet)):
-    totalKeywords.append(str(description[counter]) + str(headline[counter]))
-    counter += 1 
+def set(set):
+    counter = 0
+    for i in set:
+        temp = str(i)
+        temp = temp.lower()
+        tempList = temp.split("'headline':")
+        temp = str(tempList[1])
+        tempList = temp.split("'authors'")
+        headline.append(tempList[0])
+        tempList = temp.split("'short_description':")
+        temp = str(tempList[1])
+        tempList = temp.split("'date':")
+        description.append(tempList[0])
+
+    for i in range(0, 100):
+        totalKeywords.append(str(description[counter]) + str(headline[counter]))
+        counter += 1 
+
+
+
+    for i in totalKeywords:
+        s = re.sub(r'[^A-Za-z ]+', '', i)
+        tokenKeywords.append(word_tokenize(s))
+    for i in stop_words:
+        stopWords.append(i)
+
+    counter = 0
+
+    for i in tokenKeywords:
+        for x in i:
+            if x in stopWords:
+                tokenKeywords[counter].remove(str(x))
+        counter += 1
+
+
+    checkList = []
+
+    for i in tokenKeywords:
+        freqDistro = nltk.FreqDist(i)
+        checkList.append(list(freqDistro.most_common()))
+    return checkList
 
 stopWords = []
-
-for i in totalKeywords:
-    s = re.sub(r'[^A-Za-z ]+', '', i)
-    tokenKeywords.append(word_tokenize(s))
-for i in stop_words:
-    stopWords.append(i)
-
-counter = 0
-
-for i in tokenKeywords:
-    for x in i:
-        if x in stopWords:
-            tokenKeywords[counter].remove(str(x))
-    counter += 1
-
-
-commonList = []
-
-for i in tokenKeywords:
-    freqDistro = nltk.FreqDist(i)
-    commonList.append(list(freqDistro.most_common()))
-
-primeArray = []
-   
+listTest = set(testSet)
+listCheck = set(checkSet)
 counter = 0
 CrimeWords = []
-testWordList = []
+primeArray = []
 
 CatWords(Categories[0], CrimeWords)
 CrimeWordCount = CatWordsCount(Categories[0], CrimeWords)
 CrimeWords.sort()
 
-print("Total number of words for Crime Articles: " + str(CrimeWordCount))
-print("Unique Words and the number times they occur.")
-print(CrimeWords)
 
+CrimeResults = compCat(CrimeWords)
+counter = 0
+
+
+probArticleType = probCat(Categories)
+total = 0
+##for i in CrimeResults[0:1]:
+##    tempArray = []
+##    tempArray = str(i).split(" ")
+##    tempFloatArray = []
+##    for x in tempArray:
+##        value = None
+##        numeric_string = re.sub("[^0-9.]", "", x)
+##        value = float(numeric_string)
+##        total = float(probArticleType[0])
+##        tempFloatArray.append(value)
+##    for i in tempFloatArray:
+##        total = total * i
+print(testSet[0])
+print(listTest[0])
+print(CrimeWords)
+print(CrimeResults[0])
 
