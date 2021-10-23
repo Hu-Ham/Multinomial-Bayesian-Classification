@@ -10,14 +10,15 @@ Description:
 This program takes a json file and runs a bayesian classification calculation
 on the data to algorithmically determine what classification each article would
 be based on the title and short description provided. It will then compare what
-the algorithm says is most likely and what the desription actually is to
+the algorithm says is most likely and what the description actually is to
 determine how well the calculation did.
 """
-#Import libraries required for code to run
+# Import libraries required for code to run
 import json
 import re
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
+
 stop_words = set(stopwords.words('english'))
 import nltk
 
@@ -27,33 +28,49 @@ This Function takes a Category type and a Category list and combines
 all the word counts. For example if there are two 'murder', '1' it deletes
 one and makes it 'murder', '2' 
 """
-def CatWords(Cat, WordVar):
+
+
+def CatWords(Cat, dataSet):
     testWordList = []
-    counter = 0
-    catList = 0
-    for x in testSet:
+    counter_1 = 0
+    WordVar = []
+    primeArray.clear()
+    for x in dataSet:
+        # print(len(listTest))
         if Cat in str(x):
-            primeArray.append(listTest[counter])
-        counter += 1
-    counter = 0
-    
-    
+            # print(counter_1)
+            primeArray.append(listTest[counter_1])
+        counter_1 += 1
+    # print("top loop" + str(counter_1))
+    counter_1 = 0
     for i in primeArray:
+        # print(counter_1)
+        #print("Primearray: " + str(i))
         for x in i:
+
             if x[0] not in stopWords:
                 if x[0] not in testWordList:
+                    #print('flag')
                     testWordList.append(x[0])
                     WordVar.append([x[0], 1])
                 else:
-                    for y in WordVar:
-                        if x[0] == y[0]:
-                            WordVar.remove(y)
-                            WordVar.append([x[0], (x[1]+1)])     
-    primeArray.clear()
+                    #print("else value: " + str(x))
+                    index = testWordList.index(x[0])
+                    value_1 = WordVar[index][1]
+                    WordVar[index] = ([x[0], (value_1 + 1)])
+                    #print("after" + str(WordVar))
+        counter_1 += 1
+
+
+    return WordVar
+
+
 """
 Counts the total number of words in the list
 """
-def CatWordsCount(Cat, WordVar):
+
+
+def CatWordsCount(WordVar):
     count = 0
     for y in WordVar:
         count += y[1]
@@ -61,10 +78,8 @@ def CatWordsCount(Cat, WordVar):
 
 
 def compCat(wordVar):
-    counter = 0
     tempResults = []
     finalResults = []
-    strResults = ''
     for i in listCheck:
         tempResults.clear()
         strResults = ''
@@ -72,25 +87,28 @@ def compCat(wordVar):
             for x in wordVar:
                 tempWord = z[0]
                 if tempWord == x[0]:
-                    tempResults.append(x[1]/CrimeWordCount)    
-        for i in tempResults:
-            strResults = strResults + " " + str(i)
+                    tempResults.append(x[1] / CrimeWordCount)
+        for y in tempResults:
+            strResults = strResults + " " + str(y)
         results = strResults[1:]
         finalResults.append([results])
-    return(finalResults)
+    return finalResults
+
+
 def probCat(Cat):
-    probCat = []
+    probCategory = []
     for i in Cat:
         count = 0
         for x in listTest:
             tempData = str(x)
             if i in tempData:
                 count += 1
-        probCat.append(count/len(testSet))
+        probCategory.append(count / len(testSet))
 
-    return(probCat)
+    return probCategory
 
-#Importing in the json file that contains the data
+
+# Importing in the json file that contains the data
 data = [json.loads(line) for line in open('News_Category_Dataset_v2.json', 'r')]
 
 """
@@ -101,23 +119,23 @@ determine each classification. The for loop will append each data element into a
 list.
 """
 CrimeWordCount = 0
-testCount = round(.2*len(data))
+testCount = round(.2 * len(data))
 testSet = []
 checkSet = []
 
-for i in data[0:testCount]:
+for i in data[0:5000]:
     testSet.append(i)
-    
-for i in data[testCount+1: ]:
+
+for i in data[testCount + 1: testCount + 10000]:
     checkSet.append(i)
 
-#These are the categories the dataset can be classified into
+# These are the categories the dataset can be classified into
 Categories = ['CRIME', 'ENTERTAINMENT', 'WORLD NEWS', 'IMPACT', 'POLITICS', 'WEIRD NEWS',
               'BLACK VOICES', 'WOMEN', 'COMEDY', 'QUEER VOICES', 'SPORTS', 'BUSINESS',
               'TRAVEL', 'MEDIA', 'TECH', 'RELIGION', 'SCIENCE', 'LATINO VOICES',
               'EDUCATION', 'COLLEGE', 'PARENTS', 'STYLE', 'GREEN', 'TASTE',
               'HEALTHY LIVING', 'WORLDPOST', 'GOOD NEWS', 'FIFTY', 'ARTS']
-#List and variables needed to strip unnecessary information and tokenize each data element
+# List and variables needed to strip unnecessary information and tokenize each data element
 headline = []
 description = []
 temp = ''
@@ -134,51 +152,11 @@ of each data element and stores them in two separate lists. The next for loop co
 those two lists into one. And finally the third loop strips non-alphanumeric characters except
 for spaces and then tokenizes the data element.
 """
-##for i in testSet:
-##    temp = str(i)
-##    temp = temp.lower()
-##    tempList = temp.split("'headline':")
-##    temp = str(tempList[1])
-##    tempList = temp.split("'authors'")
-##    headline.append(tempList[0])
-##    tempList = temp.split("'short_description':")
-##    temp = str(tempList[1])
-##    tempList = temp.split("'date':")
-##    description.append(tempList[0])
-##
-##for i in range(0, len(testSet)):
-##    totalKeywords.append(str(description[counter]) + str(headline[counter]))
-##    counter += 1 
-##
-##stopWords = []
-##
-##for i in totalKeywords:
-##    s = re.sub(r'[^A-Za-z ]+', '', i)
-##    tokenKeywords.append(word_tokenize(s))
-##for i in stop_words:
-##    stopWords.append(i)
-##
-##counter = 0
-##
-##for i in tokenKeywords:
-##    for x in i:
-##        if x in stopWords:
-##            tokenKeywords[counter].remove(str(x))
-##    counter += 1
-##
-##
-##
-##
-##for i in tokenKeywords:
-##    freqDistro = nltk.FreqDist(i)
-##    commonList.append(list(freqDistro.most_common()))
-##
-##primeArray = []
-   
 
-def set(set):
-    counter = 0
-    for i in set:
+
+def createDataSet(dataSet):
+    counter_2 = 0
+    for i in dataSet:
         temp = str(i)
         temp = temp.lower()
         tempList = temp.split("'headline':")
@@ -190,11 +168,9 @@ def set(set):
         tempList = temp.split("'date':")
         description.append(tempList[0])
 
-    for i in range(0, 100):
-        totalKeywords.append(str(description[counter]) + str(headline[counter]))
-        counter += 1 
-
-
+    for i in range(0, len(dataSet)):
+        totalKeywords.append(str(description[counter_2]) + str(headline[counter_2]))
+        counter_2 += 1
 
     for i in totalKeywords:
         s = re.sub(r'[^A-Za-z ]+', '', i)
@@ -202,14 +178,13 @@ def set(set):
     for i in stop_words:
         stopWords.append(i)
 
-    counter = 0
+    counter_2 = 0
 
     for i in tokenKeywords:
         for x in i:
             if x in stopWords:
-                tokenKeywords[counter].remove(str(x))
-        counter += 1
-
+                tokenKeywords[counter_2].remove(str(x))
+        counter_2 += 1
 
     checkList = []
 
@@ -218,24 +193,23 @@ def set(set):
         checkList.append(list(freqDistro.most_common()))
     return checkList
 
+
 stopWords = []
-listTest = set(testSet)
-listCheck = set(checkSet)
-counter = 0
+listTest = createDataSet(testSet)
+
+listCheck = createDataSet(checkSet)
+
 CrimeWords = []
 primeArray = []
 
-CatWords(Categories[0], CrimeWords)
-CrimeWordCount = CatWordsCount(Categories[0], CrimeWords)
+CrimeWords = CatWords(Categories[0], testSet)
+CrimeWordCount = CatWordsCount(CrimeWords)
 CrimeWords.sort()
 
-
 CrimeResults = compCat(CrimeWords)
-counter = 0
-
 
 probArticleType = probCat(Categories)
-total = 0
+
 ##for i in CrimeResults[0:1]:
 ##    tempArray = []
 ##    tempArray = str(i).split(" ")
@@ -248,8 +222,17 @@ total = 0
 ##        tempFloatArray.append(value)
 ##    for i in tempFloatArray:
 ##        total = total * i
-print(testSet[0])
-print(listTest[0])
-print(CrimeWords)
-print(CrimeResults[0])
+##print(testSet[0])
+##print(listTest[0])
+##print(CrimeWords)
+##print(CrimeResults[0])
+testingStr = "'category': 'CRIME', 'headline': 'There Were 2 Mass Shootings In Texas Last Week, But Only 1 On TV', 'authors':  " \
+             "'link': 'https://www.huff89', 'short_description': 'She left her husband. He killed their children. Just another day in America.', 'date': '20'"
+testingSet = []
+for i in range(0, 10):
+    testingSet.append(testingStr)
 
+testingWords = CatWords(Categories[0], testingSet)
+
+for i in CrimeResults:
+    print(i)
