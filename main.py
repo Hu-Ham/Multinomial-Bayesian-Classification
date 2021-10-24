@@ -34,7 +34,7 @@ def CatWords(Cat, dataSet):
     testWordList = []
     counter_1 = 0
     WordVar = []
-    primeArray.clear()
+    primeArray = []
     for x in dataSet:
         # print(len(listTest))
         if Cat in str(x):
@@ -77,21 +77,21 @@ def CatWordsCount(WordVar):
     return count
 
 
-def compCat(wordVar):
-    tempResults = []
+def compCat(wordVar, wordCount):
     finalResults = []
-    for i in listCheck:
-        tempResults.clear()
-        strResults = ''
+
+    for i in listCheck[0:10]:
+        tempResults = []
+        counter_2 = 0
+        tempCheckList = []
         for z in i:
+            tempCheckList.append(z[0])
             for x in wordVar:
-                tempWord = z[0]
+                tempWord = tempCheckList[counter_2]
                 if tempWord == x[0]:
-                    tempResults.append(x[1] / CrimeWordCount)
-        for y in tempResults:
-            strResults = strResults + " " + str(y)
-        results = strResults[1:]
-        finalResults.append([results])
+                    tempResults.append([x[0], (x[1] / wordCount)])
+            counter_2 += 1
+        finalResults.append(tempResults)
     return finalResults
 
 
@@ -99,12 +99,12 @@ def probCat(Cat):
     probCategory = []
     for i in Cat:
         count = 0
-        for x in listTest:
+        for x in testSet:
+
             tempData = str(x)
             if i in tempData:
                 count += 1
         probCategory.append(count / len(testSet))
-
     return probCategory
 
 
@@ -123,10 +123,10 @@ testCount = round(.2 * len(data))
 testSet = []
 checkSet = []
 
-for i in data[0:5000]:
+for i in data[0:testCount]:
     testSet.append(i)
 
-for i in data[testCount + 1: testCount + 10000]:
+for i in data[testCount + 1:testCount + 100]:
     checkSet.append(i)
 
 # These are the categories the dataset can be classified into
@@ -196,43 +196,75 @@ def createDataSet(dataSet):
 
 stopWords = []
 listTest = createDataSet(testSet)
-
 listCheck = createDataSet(checkSet)
-
-CrimeWords = []
-primeArray = []
-
+"""
 CrimeWords = CatWords(Categories[0], testSet)
-CrimeWordCount = CatWordsCount(CrimeWords)
-CrimeWords.sort()
+EntertainmentWords = CatWords(Categories[1], testSet)
+WorldNewsWords = CatWords(Categories[2], testSet)
+ImpactWords = CatWords(Categories[3], testSet)
+PoliticsWords = CatWords(Categories[4], testSet)
+WeirdNewsWords = CatWords(Categories[5], testSet)
+BlackVoicesWords = CatWords(Categories[6], testSet)
+WomenWords = CatWords(Categories[7], testSet)
+ComedyWords = CatWords(Categories[8], testSet)
+QueerVoicesWords = CatWords(Categories[9], testSet)
+SportsWords = CatWords(Categories[10], testSet)
+BusinessWords = CatWords(Categories[11], testSet)
+TravelWords = CatWords(Categories[12], testSet)
+MediaWords = CatWords(Categories[13], testSet)
+TechWords = CatWords(Categories[14], testSet)
+ReligionWords = CatWords(Categories[15], testSet)
+ScienceWords = CatWords(Categories[16], testSet)
+LatinoVoicesWords = CatWords(Categories[17], testSet)
+EducationWords = CatWords(Categories[18], testSet)
+CollegeWords = CatWords(Categories[19], testSet)
+ParentsWords = CatWords(Categories[20], testSet)
+StyleWords = CatWords(Categories[21], testSet)
+GreenWords = CatWords(Categories[22], testSet)
+TasteWords = CatWords(Categories[23], testSet)
+HealthWords = CatWords(Categories[24], testSet)
+WorldPostWords = CatWords(Categories[25], testSet)
+GoodNewsWords = CatWords(Categories[26], testSet)
+FiftyWords = CatWords(Categories[27], testSet)
+ArtsWords = CatWords(Categories[28], testSet)
 
-CrimeResults = compCat(CrimeWords)
+AllCatWords = [CrimeWords, EntertainmentWords, WorldNewsWords, ImpactWords, PoliticsWords,
+               WeirdNewsWords, BlackVoicesWords, WomenWords, ComedyWords, QueerVoicesWords,
+               SportsWords, BusinessWords, TravelWords, MediaWords, TechWords, ReligionWords,
+               ScienceWords, LatinoVoicesWords, EducationWords, CollegeWords, ParentsWords,
+               StyleWords, GreenWords, TasteWords, HealthWords, WorldPostWords, GoodNewsWords,
+               FiftyWords,  ArtsWords]
+"""
+allCatCounter = 0
+AllCatWords = []
+for i in Categories:
+    tempResults_1 = CatWords(Categories[allCatCounter], testSet)
+    AllCatWords.append(tempResults_1)
+    allCatCounter += 1
+AllCatWordCounts = []
+for i in AllCatWords:
+    AllCatWordCounts.append(CatWordsCount(i))
+
+AllCatResults = []
+allCatCounter = 0
+for i in Categories:
+    tempResults_2 = compCat(AllCatWords[allCatCounter], AllCatWordCounts[allCatCounter])
+    AllCatResults.append(tempResults_2)
+    allCatCounter += 1
 
 probArticleType = probCat(Categories)
 
-##for i in CrimeResults[0:1]:
-##    tempArray = []
-##    tempArray = str(i).split(" ")
-##    tempFloatArray = []
-##    for x in tempArray:
-##        value = None
-##        numeric_string = re.sub("[^0-9.]", "", x)
-##        value = float(numeric_string)
-##        total = float(probArticleType[0])
-##        tempFloatArray.append(value)
-##    for i in tempFloatArray:
-##        total = total * i
-##print(testSet[0])
-##print(listTest[0])
-##print(CrimeWords)
-##print(CrimeResults[0])
-testingStr = "'category': 'CRIME', 'headline': 'There Were 2 Mass Shootings In Texas Last Week, But Only 1 On TV', 'authors':  " \
-             "'link': 'https://www.huff89', 'short_description': 'She left her husband. He killed their children. Just another day in America.', 'date': '20'"
-testingSet = []
-for i in range(0, 10):
-    testingSet.append(testingStr)
+testCounter = 0
+total = 0
+resultsRecord = []
+for i in AllCatResults[0:1]:
+    print(str(testCounter) + ": " + str(i))
+    calcValue = probArticleType[testCounter]
+    for z in Categories:
+        for x in i:
+            print(x[1][1])
+            calcValue = calcValue * x[1][1]
+        print(str(Categories[testCounter]) + ": " + str(calcValue))
+        testCounter += 1
+        resultsRecord.append(calcValue)
 
-testingWords = CatWords(Categories[0], testingSet)
-
-for i in CrimeResults:
-    print(i)
