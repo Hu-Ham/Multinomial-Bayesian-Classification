@@ -45,22 +45,21 @@ def CatWords(Cat, dataSet):
     counter_1 = 0
     for i in primeArray:
         # print(counter_1)
-        #print("Primearray: " + str(i))
+        # print("Primearray: " + str(i))
         for x in i:
 
             if x[0] not in stopWords:
                 if x[0] not in testWordList:
-                    #print('flag')
+                    # print('flag')
                     testWordList.append(x[0])
                     WordVar.append([x[0], 1])
                 else:
-                    #print("else value: " + str(x))
+                    # print("else value: " + str(x))
                     index = testWordList.index(x[0])
                     value_1 = WordVar[index][1]
                     WordVar[index] = ([x[0], (value_1 + 1)])
-                    #print("after" + str(WordVar))
+                    # print("after" + str(WordVar))
         counter_1 += 1
-
 
     return WordVar
 
@@ -257,14 +256,37 @@ probArticleType = probCat(Categories)
 testCounter = 0
 total = 0
 resultsRecord = []
-for i in AllCatResults[0:1]:
-    print(str(testCounter) + ": " + str(i))
+res = []
+for i in AllCatResults[0:2]:
     calcValue = probArticleType[testCounter]
     for z in Categories:
         for x in i:
-            print(x[1][1])
             calcValue = calcValue * x[1][1]
-        print(str(Categories[testCounter]) + ": " + str(calcValue))
         testCounter += 1
-        resultsRecord.append(calcValue)
+        res.append(calcValue)
+    resultsRecord.append(res)
+    testCounter = 0
+
+
+
+maxValue = 0
+finalCatWords = []
+for i in resultsRecord:
+    for item in range(0, len(i)):
+        floatValue = i[item]
+        if floatValue > maxValue:
+            maxValue = floatValue
+    maxIndex = i.index(maxValue)
+    maxValue = 0
+    finalCatWords.append(Categories[maxIndex])
+for i in checkSet[0:1]:
+    print(i)
+countRight = 0
+accuracy = 0
+for i in finalCatWords:
+    for x in checkSet:
+        if i in x:
+            countRight += 1
+            print(countRight)
+    accuracy = countRight/len(listCheck)
 
