@@ -196,44 +196,8 @@ def createDataSet(dataSet):
 stopWords = []
 listTest = createDataSet(testSet)
 listCheck = createDataSet(checkSet)
-"""
-CrimeWords = CatWords(Categories[0], testSet)
-EntertainmentWords = CatWords(Categories[1], testSet)
-WorldNewsWords = CatWords(Categories[2], testSet)
-ImpactWords = CatWords(Categories[3], testSet)
-PoliticsWords = CatWords(Categories[4], testSet)
-WeirdNewsWords = CatWords(Categories[5], testSet)
-BlackVoicesWords = CatWords(Categories[6], testSet)
-WomenWords = CatWords(Categories[7], testSet)
-ComedyWords = CatWords(Categories[8], testSet)
-QueerVoicesWords = CatWords(Categories[9], testSet)
-SportsWords = CatWords(Categories[10], testSet)
-BusinessWords = CatWords(Categories[11], testSet)
-TravelWords = CatWords(Categories[12], testSet)
-MediaWords = CatWords(Categories[13], testSet)
-TechWords = CatWords(Categories[14], testSet)
-ReligionWords = CatWords(Categories[15], testSet)
-ScienceWords = CatWords(Categories[16], testSet)
-LatinoVoicesWords = CatWords(Categories[17], testSet)
-EducationWords = CatWords(Categories[18], testSet)
-CollegeWords = CatWords(Categories[19], testSet)
-ParentsWords = CatWords(Categories[20], testSet)
-StyleWords = CatWords(Categories[21], testSet)
-GreenWords = CatWords(Categories[22], testSet)
-TasteWords = CatWords(Categories[23], testSet)
-HealthWords = CatWords(Categories[24], testSet)
-WorldPostWords = CatWords(Categories[25], testSet)
-GoodNewsWords = CatWords(Categories[26], testSet)
-FiftyWords = CatWords(Categories[27], testSet)
-ArtsWords = CatWords(Categories[28], testSet)
 
-AllCatWords = [CrimeWords, EntertainmentWords, WorldNewsWords, ImpactWords, PoliticsWords,
-               WeirdNewsWords, BlackVoicesWords, WomenWords, ComedyWords, QueerVoicesWords,
-               SportsWords, BusinessWords, TravelWords, MediaWords, TechWords, ReligionWords,
-               ScienceWords, LatinoVoicesWords, EducationWords, CollegeWords, ParentsWords,
-               StyleWords, GreenWords, TasteWords, HealthWords, WorldPostWords, GoodNewsWords,
-               FiftyWords,  ArtsWords]
-"""
+
 allCatCounter = 0
 AllCatWords = []
 for i in Categories:
@@ -257,36 +221,48 @@ testCounter = 0
 total = 0
 resultsRecord = []
 res = []
+
 for i in AllCatResults[0:2]:
-    calcValue = probArticleType[testCounter]
+    print("i: " + str(i))
     for z in Categories:
+        print("z: " + str(z))
+        testCounter = 0
         for x in i:
-            calcValue = calcValue * x[1][1]
-        testCounter += 1
-        res.append(calcValue)
+            print("x: " + str(x))
+            res.clear()
+            calcValue = probArticleType[testCounter]
+            for y in x:
+                calcValue = calcValue * y[1]
+            res.append(calcValue)
+            testCounter += 1
+            print("flag")
+        print('flag_2')
+        print(res)
     resultsRecord.append(res)
-    testCounter = 0
+print(resultsRecord[0])
+print(resultsRecord[1])
 
+#
+# maxValue = 0
+# finalCatWords = []
+# for i in resultsRecord:
+#     for item in range(0, len(i)):
+#         floatValue = i[item]
+#         if floatValue > maxValue:
+#             maxValue = floatValue
+#     maxIndex = i.index(maxValue)
+#     maxValue = 0
+#     finalCatWords.append(Categories[maxIndex])
+# for i in checkSet[0:1]:
+#     print(i)
+# countRight = 0
+# accuracy = 0
+# for i in finalCatWords:
+#     for x in checkSet:
+#         if i in x:
+#             countRight += 1
+#             print(countRight)
+#     accuracy = countRight/len(listCheck)
+#
 
-
-maxValue = 0
-finalCatWords = []
-for i in resultsRecord:
-    for item in range(0, len(i)):
-        floatValue = i[item]
-        if floatValue > maxValue:
-            maxValue = floatValue
-    maxIndex = i.index(maxValue)
-    maxValue = 0
-    finalCatWords.append(Categories[maxIndex])
-for i in checkSet[0:1]:
-    print(i)
-countRight = 0
-accuracy = 0
-for i in finalCatWords:
-    for x in checkSet:
-        if i in x:
-            countRight += 1
-            print(countRight)
-    accuracy = countRight/len(listCheck)
 
