@@ -78,8 +78,9 @@ def CatWordsCount(WordVar):
 
 def compCat(wordVar, wordCount):
     finalResults = []
-
-    for i in listCheck[0:10]:
+    successCounter = 0
+    for i in listCheck[0:12]:
+        tempWord = ""
         tempResults = []
         counter_2 = 0
         tempCheckList = []
@@ -87,8 +88,14 @@ def compCat(wordVar, wordCount):
             tempCheckList.append(z[0])
             for x in wordVar:
                 tempWord = tempCheckList[counter_2]
+                # print("article word" + str(tempWord))
+                # print("category word" + str(x[0]))
                 if tempWord == x[0]:
                     tempResults.append([x[0], (x[1] / wordCount)])
+                    successCounter = 1
+            if successCounter == 0:
+                tempResults.append([tempWord, (1 / wordCount)])
+            successCounter = 0
             counter_2 += 1
         finalResults.append(tempResults)
     return finalResults
@@ -118,7 +125,7 @@ determine each classification. The for loop will append each data element into a
 list.
 """
 CrimeWordCount = 0
-testCount = round(.2 * len(data))
+testCount = round(.3 * len(data))
 testSet = []
 checkSet = []
 
@@ -222,47 +229,36 @@ total = 0
 resultsRecord = []
 res = []
 
-for i in AllCatResults[0:2]:
-    print("i: " + str(i))
-    for z in Categories:
-        print("z: " + str(z))
-        testCounter = 0
-        for x in i:
-            print("x: " + str(x))
-            res.clear()
-            calcValue = probArticleType[testCounter]
-            for y in x:
-                calcValue = calcValue * y[1]
-            res.append(calcValue)
-            testCounter += 1
-            print("flag")
-        print('flag_2')
-        print(res)
-    resultsRecord.append(res)
-print(resultsRecord[0])
-print(resultsRecord[1])
+catRes = []
+for i in AllCatResults:
+    print(i)
+    res.clear()
+    for z in i:
+        calcValue = probArticleType[testCounter]
+        print("Prob Article: " + str(calcValue))
+        for y in z:
+            calcValue = calcValue * y[1]
+        res.append(calcValue)
+    catRes.append(res[:])
+    print("Results: " + str(res))
+    testCounter += 1
+counter = 0
+tempRes = []
+wordRes = []
+counter_3 = 0
+for x in range(len(catRes[0])):
+    for i in catRes:
+        tempValue = i[counter_3]
+        tempRes.append(tempValue)
+    wordRes.append(tempRes[:])
+    tempRes.clear()
+    counter_3 += 1
 
-#
-# maxValue = 0
-# finalCatWords = []
-# for i in resultsRecord:
-#     for item in range(0, len(i)):
-#         floatValue = i[item]
-#         if floatValue > maxValue:
-#             maxValue = floatValue
-#     maxIndex = i.index(maxValue)
-#     maxValue = 0
-#     finalCatWords.append(Categories[maxIndex])
-# for i in checkSet[0:1]:
-#     print(i)
-# countRight = 0
-# accuracy = 0
-# for i in finalCatWords:
-#     for x in checkSet:
-#         if i in x:
-#             countRight += 1
-#             print(countRight)
-#     accuracy = countRight/len(listCheck)
-#
-
+finalResult = []
+for i in wordRes:
+    finalResult.append([i.index(max(i)), max(i)])
+print(testSet[0])
+for i in finalResult:
+    print(i)
+    print(Categories[i[0]])
 
