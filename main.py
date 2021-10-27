@@ -258,7 +258,15 @@ finalResult = []
 for i in wordRes:
     finalResult.append([i.index(max(i)), max(i)])
 print(testSet[0])
+
+counter = 0
 for i in finalResult:
     print(i)
     print(Categories[i[0]])
-
+    print(AllCatResults[counter])
+    if Categories[i[0]] in AllCatResults[counter]:
+        print('flag')
+        TotalTotal += 1
+        finalArray[i[0]] += 1
+    counter += 1
+print(finalArray)
