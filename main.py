@@ -7,7 +7,6 @@ Nathaniel Champion
 Hugh Hamilton
 Chris Beatrez
 Andrew Kivrak
-
 Description:
 This program takes a json file and runs a bayesian classification calculation
 on the data to algorithmically determine what classification each article would
@@ -57,14 +56,13 @@ def CatWords(Cat, dataSet):
     """
     for i in primeArray:
         for x in i:
-            if x[0] not in stopWords:
-                if x[0] not in testWordList:
-                    testWordList.append(x[0])
-                    WordVar.append([x[0], 1])
-                else:
-                    index = testWordList.index(x[0])
-                    value_1 = WordVar[index][1]
-                    WordVar[index] = ([x[0], (value_1 + 1)])
+            if x[0] not in stopWords and x[0] not in testWordList:
+                testWordList.append(x[0])
+                WordVar.append([x[0], 1])
+            else:
+                index = testWordList.index(x[0])
+                value_1 = WordVar[index][1]
+                WordVar[index] = ([x[0], (value_1 + 1)])
         counter_1 += 1
     for i in WordVar:
         if i[1] != 1:
@@ -207,6 +205,7 @@ checkSet = []
 
 for i in data[0:testCount]:
     testSet.append(i)
+    
 for i in data[testCount + 1:testCount + 10000]:
     checkSet.append(i)
 
