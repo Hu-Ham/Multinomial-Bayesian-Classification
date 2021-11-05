@@ -23,127 +23,6 @@ stop_words = set(stopwords.words('english'))
 import nltk
 
 ######################FUNCTIONS######################
-"""This Function takes a Category type and a Category list and combines
-all the word counts. For example if there are two articles that mendtion
-'murder', then it will update to 'murder', 2 in the array."""
-
-
-def CatWords(Cat, dataSet):
-    # Creating necessary variables
-    testWordList = []
-    counter_1 = 0
-    WordVar = []
-    finalWordVar = []
-    primeArray = []
-    # For loop to iterate through the articles we are calculating
-    for x in dataSet:
-        """ If the article is equal to the compared category it
-        appends it to the testing list element that corresponds
-        to that category. Once it compares all the articles to 
-        a category the counter goes up and will then compare it
-        to the next category and add the value to that categories
-        element in listTest array.
-        """
-        if Cat in str(x):
-            primeArray.append(listTest[counter_1])
-        counter_1 += 1
-    counter_1 = 0
-    """ Now that we have an array that has all the words for each 
-    category we compare them to stopWords to remove unimportant words
-    to reduce the number of comparison and improve the accuracy. If the
-    word appears a second time in a different article instead of adding
-    the word it will increment the number of occurrences instead.
-    """
-    for i in primeArray:
-        for x in i:
-            if x[0] not in stopWords and x[0] not in testWordList:
-                testWordList.append(x[0])
-                WordVar.append([x[0], 1])
-            else:
-                index = testWordList.index(x[0])
-                value_1 = WordVar[index][1]
-                WordVar[index] = ([x[0], (value_1 + 1)])
-        counter_1 += 1
-    for i in WordVar:
-        if i[1] != 1:
-            finalWordVar.append(i)
-    # Returns the updated array
-    return finalWordVar
-
-
-"""Counts the total number of words in the list and returns
-with the total number for each category."""
-
-
-def CatWordsCount(WordVar):
-    count = 0
-    for y in WordVar:
-        count += y[1]
-    return count
-
-
-"""Function that takes in the array with the list of words
-and a total word count. It then compares the words in the 
-specific article we are comparing to the list of words in 
-each category and produces a % for the likelihood of it 
-being that article based on the number of time the word 
-appeared in that category and the total number of words."""
-
-
-def compCat(wordVar, wordCount):
-    # Creates variable required for function
-    finalResults = []
-    successCounter = 0
-    """listCheck is the array that contains the keyword for 
-    each article in a element within that array"""
-    for i in listCheck:
-        tempWord = ""
-        tempResults = []
-        counter_2 = 0
-        tempCheckList = []
-        """the variable i is an array of tuples ex: [('word', 1), 
-        ('word2', 1)] z would then just be a single tuple ('word', 1)
-         and then z[0] would just be the 'word' which is appended in the 
-         tempCheckList variable."""
-        for z in i:
-            tempCheckList.append(z[0])
-            """Takes value in the above list and compares it to each value
-            in the list of words in each category. If it finds the word it
-            adds a tuple that includes the word and the probability. If it
-            does not find the word in that list it then provides the probability
-            of the word appearing a single time. This is our smoothing code"""
-            for x in wordVar:
-                tempWord = tempCheckList[counter_2]
-                # print("article word" + str(tempWord))
-                # print("category word" + str(x[0]))
-                if tempWord == x[0]:
-                    tempResults.append([x[0], (x[1] / wordCount)])
-                    successCounter = 1
-            if successCounter == 0:
-                tempResults.append([tempWord, (1 / wordCount)])
-            successCounter = 0
-            counter_2 += 1
-        finalResults.append(tempResults)
-        # returns array with the probability for each word in an article
-    return finalResults
-
-
-"""Function that determines the probability of each category.
-ex: if there is 1 crime article and 10 total articles then
-the probability of it being a crime article is 10%."""
-
-
-def probCat(Cat):
-    probCategory = []
-    for i in Cat:
-        count = 0
-        for x in testSet:
-            tempData = str(x)
-            if i in tempData:
-                count += 1
-        probCategory.append(count / len(testSet))
-    return probCategory
-
 
 def createDataSet(dataSet):
     # List of variables needed to strip unnecessary information and tokenize each data element
@@ -190,6 +69,120 @@ def createDataSet(dataSet):
         checkList.append(list(freqDistro.most_common()))
     return checkList
 
+"""This Function takes a Category type and a Category list and combines
+all the word counts. For example if there are two articles that mention
+'murder', then it will update to 'murder', 2 in the array."""
+
+def CatWords(Cat, dataSet):
+    # Creating necessary variables
+    testWordList = []
+    counter_1 = 0
+    WordVar = []
+    finalWordVar = []
+    primeArray = []
+    # For loop to iterate through the articles we are calculating
+    for x in dataSet:
+        """ If the article is equal to the compared category it
+        appends it to the testing list element that corresponds
+        to that category. Once it compares all the articles to 
+        a category the counter goes up and will then compare it
+        to the next category and add the value to that categories
+        element in listTest array.
+        """
+        if Cat in str(x):
+            primeArray.append(listTest[counter_1])
+        counter_1 += 1
+    counter_1 = 0
+    """ Now that we have an array that has all the words for each 
+    category we compare them to stopWords to remove unimportant words
+    to reduce the number of comparison and improve the accuracy. If the
+    word appears a second time in a different article instead of adding
+    the word it will increment the number of occurrences instead.
+    """
+    for i in primeArray:
+        for x in i:
+            if x[0] not in stopWords:
+                if x[0] not in testWordList:
+                    testWordList.append(x[0])
+                    WordVar.append([x[0], 1])
+                else:
+                    index = testWordList.index(x[0])
+                    value_1 = WordVar[index][1]
+                    WordVar[index] = ([x[0], (value_1 + 1)])
+        counter_1 += 1
+    for i in WordVar:
+        if i[1] != 1:
+            finalWordVar.append(i)
+    # Returns the updated array
+    return finalWordVar
+
+"""Counts the total number of words in the list and returns
+with the total number for each category."""
+
+def CatWordsCount(WordVar):
+    count = 0
+    for y in WordVar:
+        count += y[1]
+    return count
+
+"""Function that takes in the array with the list of words
+and a total word count. It then compares the words in the 
+specific article we are comparing to the list of words in 
+each category and produces a % for the likelihood of it 
+being that article based on the number of time the word 
+appeared in that category and the total number of words."""
+
+def compCat(wordVar, wordCount):
+    # Creates variable required for function
+    finalResults = []
+    successCounter = 0
+    """listCheck is the array that contains the keyword for 
+    each article in a element within that array"""
+    for i in listCheck:
+        tempWord = ""
+        tempResults = []
+        counter_2 = 0
+        tempCheckList = []
+        """the variable i is an array of tuples ex: [('word', 1), 
+        ('word2', 1)] z would then just be a single tuple ('word', 1)
+         and then z[0] would just be the 'word' which is appended in the 
+         tempCheckList variable."""
+        for z in i:
+            tempCheckList.append(z[0])
+            """Takes value in the above list and compares it to each value
+            in the list of words in each category. If it finds the word it
+            adds a tuple that includes the word and the probability. If it
+            does not find the word in that list it then provides the probability
+            of the word appearing a single time. This is our smoothing code"""
+            for x in wordVar:
+                tempWord = tempCheckList[counter_2]
+                print("article word" + str(tempWord))
+                print("category word" + str(x[0]))
+                if tempWord == x[0]:
+                    tempResults.append([x[0], (x[1] / wordCount)])
+                    successCounter = 1
+            if successCounter == 0 & wordCount != 0:
+                tempResults.append([tempWord, (1 / wordCount)])
+            successCounter = 0
+            counter_2 += 1
+        finalResults.append(tempResults)
+        # returns array with the probability for each word in an article
+    return finalResults
+
+"""Function that determines the probability of each category.
+ex: if there is 1 crime article and 10 total articles then
+the probability of it being a crime article is 10%."""
+
+def probCat(Cat):
+    probCategory = []
+    for i in Cat:
+        count = 0
+        for x in testSet:
+            tempData = str(x)
+            if i in tempData:
+                count += 1
+        probCategory.append(count / len(testSet))
+    return probCategory
 
 # Importing in the json file that contains the data
 data = [json.loads(line) for line in open('News_Category_Dataset_v2.json', 'r')]
@@ -199,14 +192,16 @@ of the total dataset and will be used as reference. The checkset data set will b
 20% of the original dataset and will have the bayesian calculation run on it to
 determine each classification. The for loop will append each data element into a
 list."""
-testCount = round(.8 * len(data))
+testCount = 100
+#testCount = round(.8 * len(data))
 testSet = []
 checkSet = []
 
 for i in data[0:testCount]:
     testSet.append(i)
-    
-for i in data[testCount + 1:testCount + 10000]:
+
+#Limited selection of 
+for i in data[testCount + 1:testCount + 100]:
     checkSet.append(i)
 
 # These are the categories the dataset can be classified into
@@ -220,16 +215,14 @@ stopWords = []
 listTest = createDataSet(testSet)
 listCheck = createDataSet(checkSet)
 #
-allCatCounter = 0
 AllCatWords = []
 """ For loop that uses the CatWords function to create a single
-array that includes all the words from each category seperated into
-different elements. And a second for loop that does the same with
+array that includes all the words from each category separated into
+different elements. Next, a second for loop does the same with
 the CatWordsCount function."""
 for i in Categories:
-    tempResults_1 = CatWords(Categories[allCatCounter], testSet)
+    tempResults_1 = CatWords(Categories[Categories.index(i)], testSet)
     AllCatWords.append(tempResults_1)
-    allCatCounter += 1
 AllCatWordCounts = []
 for i in AllCatWords:
     AllCatWordCounts.append(CatWordsCount(i))
@@ -237,11 +230,10 @@ for i in AllCatWords:
 """for loop that takes the above arrays and creates a new array that has the
 probability of the words being in each category. """
 AllCatResults = []
-allCatCounter = 0
 for i in Categories:
-    tempResults_2 = compCat(AllCatWords[allCatCounter], AllCatWordCounts[allCatCounter])
+    localIndex = Categories.index(i)
+    tempResults_2 = compCat(AllCatWords[localIndex], AllCatWordCounts[localIndex])
     AllCatResults.append(tempResults_2)
-    allCatCounter += 1
 # Array that uses the probCat function to determine prob of article
 probArticleType = probCat(Categories)
 
@@ -293,7 +285,7 @@ finalResult = []
 for i in wordRes:
     finalResult.append([i.index(max(i)), max(i)])
 
-"""Compares our answer using bayesion formula with the correct
+"""Compares our answer using Bayesian formula with the correct
 answer provided by the original json file."""
 TotalTotal = 0
 finalArray = [0]*29
