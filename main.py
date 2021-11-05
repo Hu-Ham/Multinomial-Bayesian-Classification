@@ -8,7 +8,7 @@ Hugh Hamilton
 Chris Beatrez
 Andrew Kivrak
 Description:
-This program takes a json file and runs a bayesian classification calculation
+This program takes a JSON file and runs a bayesian classification calculation
 on the data to algorithmically determine what classification each article would
 be based on the title and short description provided. It will then compare what
 the algorithm says is most likely and what the description actually is to
@@ -22,33 +22,28 @@ from nltk.corpus import stopwords
 
 stop_words = set(stopwords.words('english'))
 
+# These are the categories the dataset can be classified into. In global scope, not subject to change
+CATEGORIES = ('CRIME', 'ENTERTAINMENT', 'WORLD NEWS', 'IMPACT', 'POLITICS', 'WEIRD NEWS',
+              'BLACK VOICES', 'WOMEN', 'COMEDY', 'QUEER VOICES', 'SPORTS', 'BUSINESS',
+              'TRAVEL', 'MEDIA', 'TECH', 'RELIGION', 'SCIENCE', 'LATINO VOICES',
+              'EDUCATION', 'COLLEGE', 'PARENTS', 'STYLE', 'GREEN', 'TASTE',
+              'HEALTHY LIVING', 'WORLDPOST', 'GOOD NEWS', 'FIFTY', 'ARTS')
 ######################FUNCTIONS######################
-#{"category": "QUEER VOICES", 
-# "headline": "Gay Man Denied Marriage License By Kim Davis Loses Bid To Unseat Her", 
-# "authors": "Curtis M. Wong", 
-# "link": 
-# "https://www.huffingtonpost.com/entry/david-ermold-kim-davis-primary-loss_us_5b05b6e5e4b0784cd2b0de4f", 
-# "short_description": 
-# "Despite support from Amy Schumer and Susan Sarandon, David Ermold won't challenge Davis this fall.",
-# "date": "2018-05-24"}
 
 """This function cleans and tokenizes the raw data from the JSON file"""
 def createDataSet(dataSet):
-    # List of variables needed to strip unnecessary information and tokenize each data element
-    headline = []
-    description = []
-    totalKeywords = []
-    tokenKeywords = []
-    allCleanTokens = []
-    counter_2 = 0
-    """This for loop strips out the information that is not the headline or short description part
-    of each data element and stores them in two separate lists. The next for loop concatenates
-    those two lists into one. And finally the third loop strips non-alphanumeric characters except
-    for spaces and then tokenizes the data element. Those tokenized words are compared to a 
-    stopwords array and if they are not present in that array that are then appended to a final
-    array that is returned. """
+    """These for loops strip out the parts of the JSON data that are not the headline or short article
+    descriptions, remove all non alphabetical (or space) characters, tokenize all words as list entries
+    and then reference them to a list of stop words expanded for non-apostrophized English."""
+    allCleanTokens = [] #The list of all clean word tokens to be produced
+    #We expand the number of stop words to include variations missing apostrophes
+    stop_words = nltk.corpus.stopwords.words("english")
+    tokenSW = nltk.corpus.stopwords.words("english")
+    for i in stop_words:
+        s = re.sub(r'[^A-Za-z ]+', '', i)
+        tokenSW.append(s)
     for row in dataSet:
-        dataString = str(row).lower() #Cast all json table rows to lowercase string
+        dataString = str(row).lower() #Cast all JSON table rows to lowercase string
         #Remove all of the string prior to the headline, including article category:
         splitString = dataString.split("'headline':")
         dataString = str(splitString[1])
@@ -67,13 +62,6 @@ def createDataSet(dataSet):
         alphaString = splitString[0].replace("-", " ")
         alphaString = re.sub("[^a-zA-Z ]+", "", alphaString)
         wordTokens += word_tokenize(alphaString)
-        #Now create list of tokens without stop words
-        stop_words = nltk.corpus.stopwords.words("english")
-        #Append apostrophe-free stop words to the set as a whole
-        tokenSW = nltk.corpus.stopwords.words("english")
-        for i in stop_words:
-            s = re.sub(r'[^A-Za-z ]+', '', i)
-            tokenSW.append(s)
         cleanTokens = [token for token in wordTokens if not token in tokenSW]
         allCleanTokens.append(cleanTokens)
     checkList = []
@@ -83,7 +71,7 @@ def createDataSet(dataSet):
     print(checkList)
     return checkList
 
-"""This function takes a Category type and a Category list and combines
+"""This function takes a type denoting the  and a Category list and combines
 all the word counts. For example if there are two articles that mention
 'murder', then it will update to 'murder', 2 in the array."""
 
@@ -198,7 +186,8 @@ def probCat(Cat):
         probCategory.append(count / len(testSet))
     return probCategory
 
-# Importing in the json file that contains the data
+#Beginning of program execution: 
+# Importing in the JSON file that contains the data
 data = [json.loads(line) for line in open('News_Category_Dataset_v2.json', 'r')]
 
 """These variables are use to cut the data set into 2 parts. The test data set is 80%
@@ -217,13 +206,6 @@ for i in data[0:testCount]:
 #Limited selection of 
 for i in data[testCount + 1:testCount + 100]:
     checkSet.append(i)
-
-# These are the categories the dataset can be classified into
-CATEGORIES = ('CRIME', 'ENTERTAINMENT', 'WORLD NEWS', 'IMPACT', 'POLITICS', 'WEIRD NEWS',
-              'BLACK VOICES', 'WOMEN', 'COMEDY', 'QUEER VOICES', 'SPORTS', 'BUSINESS',
-              'TRAVEL', 'MEDIA', 'TECH', 'RELIGION', 'SCIENCE', 'LATINO VOICES',
-              'EDUCATION', 'COLLEGE', 'PARENTS', 'STYLE', 'GREEN', 'TASTE',
-              'HEALTHY LIVING', 'WORLDPOST', 'GOOD NEWS', 'FIFTY', 'ARTS')
 
 stopWords = []
 listTest = createDataSet(testSet)
@@ -300,7 +282,7 @@ for i in wordRes:
     finalResult.append([i.index(max(i)), max(i)])
 
 """Compares our answer using Bayesian formula with the correct
-answer provided by the original json file."""
+answer provided by the original JSON file."""
 TotalTotal = 0
 finalArray = [0]*29
 totalFinalArray = [0]*29
