@@ -16,20 +16,30 @@ determine how well the calculation performed."""
 # Import libraries required for code to run
 import json
 import re
+import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 
 stop_words = set(stopwords.words('english'))
-import nltk
 
 ######################FUNCTIONS######################
+#{"category": "QUEER VOICES", 
+# "headline": "Gay Man Denied Marriage License By Kim Davis Loses Bid To Unseat Her", 
+# "authors": "Curtis M. Wong", 
+# "link": 
+# "https://www.huffingtonpost.com/entry/david-ermold-kim-davis-primary-loss_us_5b05b6e5e4b0784cd2b0de4f", 
+# "short_description": 
+# "Despite support from Amy Schumer and Susan Sarandon, David Ermold won't challenge Davis this fall.",
+# "date": "2018-05-24"}
 
+"""This function cleans and tokenizes the raw data from the JSON file"""
 def createDataSet(dataSet):
     # List of variables needed to strip unnecessary information and tokenize each data element
     headline = []
     description = []
     totalKeywords = []
     tokenKeywords = []
+    allCleanTokens = []
     counter_2 = 0
     """This for loop strips out the information that is not the headline or short description part
     of each data element and stores them in two separate lists. The next for loop concatenates
@@ -37,39 +47,43 @@ def createDataSet(dataSet):
     for spaces and then tokenizes the data element. Those tokenized words are compared to a 
     stopwords array and if they are not present in that array that are then appended to a final
     array that is returned. """
-    for i in dataSet:
-        temp = str(i)
-        temp = temp.lower()
-        tempList = temp.split("'headline':")
-        temp = str(tempList[1])
-        tempList = temp.split("'authors'")
-        headline.append(tempList[0])
-        tempList = temp.split("'short_description':")
-        temp = str(tempList[1])
-        tempList = temp.split("'date':")
-        description.append(tempList[0])
-    for i in range(0, len(dataSet)):
-        totalKeywords.append(str(description[counter_2]) + " " + str(headline[counter_2]))
-        counter_2 += 1
-    for i in totalKeywords:
-        s = re.sub(r'[^A-Za-z ]+', '', i)
-        tokenKeywords.append(word_tokenize(s))
-    for i in stop_words:
-        s = re.sub(r'[^A-Za-z ]+', '', i)
-        stopWords.append(s)
-    counter_2 = 0
-    for i in tokenKeywords:
-        for x in i:
-            if x in stopWords:
-                tokenKeywords[counter_2].remove(str(x))
-        counter_2 += 1
+    for row in dataSet:
+        dataString = str(row).lower() #Cast all json table rows to lowercase string
+        #Remove all of the string prior to the headline, including article category:
+        splitString = dataString.split("'headline':")
+        dataString = str(splitString[1])
+        #Split along authors and append headline substring to headline list
+        splitString = dataString.split("'authors'")
+        #Non alphabetical or space characters removed, and then all words added to wordTokens list
+        alphaString = splitString[0].replace("-", " ") #Also replace all dashes with spaces
+        alphaString = re.sub("[^a-zA-Z ]+", "", alphaString)
+        wordTokens = word_tokenize(alphaString)
+        #Remove the string portion before the short description substring
+        splitString = dataString.split("'short_description':")
+        dataString = str(splitString[1])
+        #Split to isolate the short description substring from the "date:" substring
+        splitString = dataString.split("'date':")
+        #Now reallocate alphabetical string with this string subsection, and add to token list
+        alphaString = splitString[0].replace("-", " ")
+        alphaString = re.sub("[^a-zA-Z ]+", "", alphaString)
+        wordTokens += word_tokenize(alphaString)
+        #Now create list of tokens without stop words
+        stop_words = nltk.corpus.stopwords.words("english")
+        #Append apostrophe-free stop words to the set as a whole
+        tokenSW = nltk.corpus.stopwords.words("english")
+        for i in stop_words:
+            s = re.sub(r'[^A-Za-z ]+', '', i)
+            tokenSW.append(s)
+        cleanTokens = [token for token in wordTokens if not token in tokenSW]
+        allCleanTokens.append(cleanTokens)
     checkList = []
-    for i in tokenKeywords:
+    for i in allCleanTokens:
         freqDistro = nltk.FreqDist(i)
         checkList.append(list(freqDistro.most_common()))
+    print(checkList)
     return checkList
 
-"""This Function takes a Category type and a Category list and combines
+"""This function takes a Category type and a Category list and combines
 all the word counts. For example if there are two articles that mention
 'murder', then it will update to 'murder', 2 in the array."""
 
@@ -156,8 +170,8 @@ def compCat(wordVar, wordCount):
             of the word appearing a single time. This is our smoothing code"""
             for x in wordVar:
                 tempWord = tempCheckList[counter_2]
-                print("article word" + str(tempWord))
-                print("category word" + str(x[0]))
+                #print("article word" + str(tempWord))
+                #print("category word" + str(x[0]))
                 if tempWord == x[0]:
                     tempResults.append([x[0], (x[1] / wordCount)])
                     successCounter = 1
@@ -205,11 +219,11 @@ for i in data[testCount + 1:testCount + 100]:
     checkSet.append(i)
 
 # These are the categories the dataset can be classified into
-Categories = ['CRIME', 'ENTERTAINMENT', 'WORLD NEWS', 'IMPACT', 'POLITICS', 'WEIRD NEWS',
+CATEGORIES = ('CRIME', 'ENTERTAINMENT', 'WORLD NEWS', 'IMPACT', 'POLITICS', 'WEIRD NEWS',
               'BLACK VOICES', 'WOMEN', 'COMEDY', 'QUEER VOICES', 'SPORTS', 'BUSINESS',
               'TRAVEL', 'MEDIA', 'TECH', 'RELIGION', 'SCIENCE', 'LATINO VOICES',
               'EDUCATION', 'COLLEGE', 'PARENTS', 'STYLE', 'GREEN', 'TASTE',
-              'HEALTHY LIVING', 'WORLDPOST', 'GOOD NEWS', 'FIFTY', 'ARTS']
+              'HEALTHY LIVING', 'WORLDPOST', 'GOOD NEWS', 'FIFTY', 'ARTS')
 
 stopWords = []
 listTest = createDataSet(testSet)
@@ -220,8 +234,8 @@ AllCatWords = []
 array that includes all the words from each category separated into
 different elements. Next, a second for loop does the same with
 the CatWordsCount function."""
-for i in Categories:
-    tempResults_1 = CatWords(Categories[Categories.index(i)], testSet)
+for i in CATEGORIES:
+    tempResults_1 = CatWords(i, testSet)
     AllCatWords.append(tempResults_1)
 AllCatWordCounts = []
 for i in AllCatWords:
@@ -230,12 +244,12 @@ for i in AllCatWords:
 """for loop that takes the above arrays and creates a new array that has the
 probability of the words being in each category. """
 AllCatResults = []
-for i in Categories:
-    localIndex = Categories.index(i)
+for i in CATEGORIES:
+    localIndex = CATEGORIES.index(i)
     tempResults_2 = compCat(AllCatWords[localIndex], AllCatWordCounts[localIndex])
     AllCatResults.append(tempResults_2)
 # Array that uses the probCat function to determine prob of article
-probArticleType = probCat(Categories)
+probArticleType = probCat(CATEGORIES)
 
 """ For loop that does the calculation for determining the likelihood
 of each article falling into each separate category. Ex: if there are
@@ -293,7 +307,7 @@ totalFinalArray = [0]*29
 
 for i in finalResult:
     totalFinalArray[i[0]] += 1
-    if Categories[i[0]] in str(checkSet[counter]):
+    if CATEGORIES[i[0]] in str(checkSet[counter]):
         TotalTotal += 1
         finalArray[i[0]] += 1
     counter += 1
@@ -305,7 +319,7 @@ for i in finalArray:
     if totalFinalArray[counter] != 0:
         accuracy = finalArray[counter]/totalFinalArray[counter]
         accuracyRound = round(accuracy, 2)*100
-    print("Cat: " + str(Categories[counter]) + " " + str(accuracyRound) + "%")
+    print("Cat: " + str(CATEGORIES[counter]) + " " + str(accuracyRound) + "%")
     counter += 1
 
 print(TotalTotal)
