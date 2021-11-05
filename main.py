@@ -68,7 +68,6 @@ def createDataSet(dataSet):
     for i in allCleanTokens:
         freqDistro = nltk.FreqDist(i)
         checkList.append(list(freqDistro.most_common()))
-    print(checkList)
     return checkList
 
 """This function takes a type denoting the  and a Category list and combines
@@ -203,8 +202,7 @@ checkSet = []
 for i in data[0:testCount]:
     testSet.append(i)
 
-#Limited selection of 
-for i in data[testCount + 1:testCount + 100]:
+for i in data[testCount:testCount + 100]:
     checkSet.append(i)
 
 stopWords = []
