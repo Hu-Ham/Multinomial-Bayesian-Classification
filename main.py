@@ -16,6 +16,7 @@ determine how well the calculation performed."""
 # Import libraries required for code to run
 import json
 import re
+from pathlib import Path 
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -42,6 +43,12 @@ def createDataSet(dataSet):
     for i in stop_words:
         s = re.sub(r'[^A-Za-z ]+', '', i)
         tokenSW.append(s)
+    #We now further expand the set of stop words using the extensive list from github user igorbrigadir:
+    #https://github.com/igorbrigadir/stopwords/tree/master/en
+    textFiles = Path('./en').glob('*.txt') #use of the glob package to create a list of stop words from .txt
+    for file in textFiles:
+        stop_words.append(file.read_text())
+
     for row in dataSet:
         dataString = str(row).lower() #Cast all JSON table rows to lowercase string
         #Remove all of the string prior to the headline, including article category:
@@ -194,15 +201,14 @@ of the total dataset and will be used as reference. The checkset data set will b
 20% of the original dataset and will have the bayesian calculation run on it to
 determine each classification. The for loop will append each data element into a
 list."""
-testCount = 100
-#testCount = round(.8 * len(data))
+testCount = round(.8 * len(data))
 testSet = []
 checkSet = []
 
 for i in data[0:testCount]:
     testSet.append(i)
 
-for i in data[testCount:testCount + 100]:
+for i in data[testCount + 1: ]:
     checkSet.append(i)
 
 stopWords = []
